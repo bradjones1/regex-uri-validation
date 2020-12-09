@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Regular Expression URI Validation &copy; Jeff Roberson (Rev:20121006)</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="Jeff Roberson" />
+	<meta name="creation-date" content="2009-03-02" />
+	<meta name="last-edit-date" content="2012-10-06" />
+	<meta name="generator" content="EditPad Pro, RegexBuddy, UltraEdit32, TopStyle Pro, CSE HTML Validator, Komodo IDE" />
+	<link rel="stylesheet" type="text/css" href="../../css/reset.css" media="all" />
+	<link rel="stylesheet" type="text/css" href="../../css/main.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="../../css/print.css" media="print" />
+	<meta name="keywords" content="jeff roberson, jmrware, Regular Expression URI Validation, URI Validation using Regular Expressions, Regular Expression, regex, URI, URL, Uniform Resource Identifier, Uniform Resource Locator, URI Validation, URL Validation, RegexBuddy, Mastering Regular Expressions, Jeffrey Friedl" />
+	<meta name="description" content="JMRware presents Regular Expressions which implement RFC3986 ADNF rules to define components of Generic URI Uniform Resource Identifiers and URL Unified Resource Locators." />
+	<script type="text/javascript" src="/bin/DynamicRegexHighlighter.js"></script>
+	<script type="text/javascript" src="URI.js"></script>
+	<style type="text/css">
+		pre { text-align: left; font-size: 1.2em;}
+	/* 	textarea {background-color: #FFA;} */
+		textarea {background-color: #CFC;}
+		select {background-color:   #FFA;}
+	</style>
+</head>
+<body>
+
+<div id="wrap">
+<h1 class="center">Regular Expression URI Validation</h1>
+
+<p class="title center">
+	&copy;	Jeff Roberson<br />
+	Created: 2009-Mar-02<br />
+	Edited: 2012-Oct-06<br />
+	<a href="URI_regexRevisionHistory.html">Revision History</a><br />
+</p>
+
+<!-- ********************************************************************************************* -->
+<h2 id="introduction">Introduction</h2>
+<p>The <dfn title="IETF">Internet Engineering Task Force</dfn>'s (<a href="http://www.ietf.org/">IETF</a>) <dfn title="RFC">Request for Comments</dfn> (<abbr title="Request for Comments">RFC</abbr>) document number 3986 titled: <dfn title="RFC3986">"Uniform Resource Identifier (URI): Generic Syntax"</dfn> (<a href="http://tools.ietf.org/html/rfc3986">RFC3986</a>), is a standard which describes the precise syntax of all components that make up a valid generic <dfn title="URI">Uniform Resource Identifier</dfn> (<abbr title="Uniform Resource Identifier">URI</abbr>). This article seeks to provide a set of <dfn title="regex">regular expressions</dfn> (<abbr title="regular expression">regex</abbr>) which accurately, clearly and efficiently describe all the various components of a <abbr title="Uniform Resource Identifier">URI</abbr>.</p>
+
+<!-- ********************************************************************************************* -->
+<h2 id="core-rules">Core Rules (RFC4234)</h2>
+<p>To define the syntax of the various URI components, RFC3986 utilizes the <dfn title="ABNF">Augmented Backus-Naur Form</dfn> (<abbr title="Augmented Backus-Naur Form">ABNF</abbr>) notation as defined in <a href="http://tools.ietf.org/html/rfc4234">RFC4234</a>. Table 1. lists all the (trivial) core rules defined in RFC4234 which are used by RFC3986.</p>
+<table cellspacing="0">
+ 	<caption>Table 1. Core <abbr title="Augmented Backus-Naur Form">ABNF</abbr> syntax rules from RFC4234</caption>
+	<thead>
+	<tr><th rowspan="2">ABNF rule name</th>
+		<th><abbr title="Augmented Backus-Naur Form">ABNF</abbr> rule syntax [ ; comments ]</th>
+	</tr>
+	<tr><th><abbr title="regex">Regular Expression</abbr> rule syntax</th>
+	</tr>
+	</thead>
+	<tbody>
+
+<!-- ALPHA -->
+	<tr id="uri-01"><td rowspan="2"><tt title="ABNF rule name">ALPHA</tt></td>
+		<td><pre title="ABNF syntax">%x41-5A / %x61-7A                         ; A-Z / a-z</pre></td></tr>
+	<tr><td class="rfc4234_ALPHA"><pre class="regex">[A-Za-z]</pre></td></tr>
+
+<!-- CR -->
+	<tr id="uri-02"><td rowspan="2"><tt title="ABNF rule name">CR</tt></td>
+		<td><pre title="ABNF syntax">%x0D                                      ; carriage return</pre></td></tr>
+	<tr><td class="rfc4234_CR"><pre class="regex">\r</pre></td></tr>
+
+<!-- DIGIT -->
+	<tr id="uri-03"><td rowspan="2"><tt title="ABNF rule name">DIGIT</tt></td>
+		<td><pre title="ABNF syntax">%x30-39                                   ; 0-9</pre></td></tr>
+	<tr><td class="rfc4234_DIGIT"><pre class="regex">[0-9]</pre></td></tr>
+
+<!-- DQUOTE -->
+	<tr id="uri-04"><td rowspan="2"><tt title="ABNF rule name">DQUOTE</tt></td>
+		<td><pre title="ABNF syntax">0x22                                      ; " (Double Quote)</pre></td></tr>
+	<tr><td class="rfc4234_DQUOTE"><pre class="regex">"</pre></td></tr>
+
+<!-- HEXDIG -->
+	<tr id="uri-05"><td rowspan="2"><tt title="ABNF rule name">HEXDIG</tt></td>
+		<td><pre title="ABNF syntax">DIGIT / "A" / "B" / "C" / "D" / "E" / "F"</pre></td></tr>
+	<tr><td class="rfc4234_HEXDIG"><pre class="regex">[0-9A-Fa-f]</pre></td></tr>
+
+<!-- LF -->
+	<tr id="uri-06"><td rowspan="2"><tt title="ABNF rule name">LF</tt></td>
+		<td><pre title="ABNF syntax">0x0A                                      ; linefeed</pre></td></tr>
+	<tr><td class="rfc4234_LF"><pre class="regex">\n</pre></td></tr>
+
+<!-- SP -->
+	<tr id="uri-07"><td rowspan="2"><tt title="ABNF rule name">SP</tt></td>
+		<td><pre title="ABNF syntax">0x20                                      ; space</pre></td></tr>
+	<tr><td class="rfc4234_SP"><pre class="regex">\x20</pre></td></tr>
+
+<!-- XXX -->
+<!--
+	<tr><td rowspan="3"><pre>XXX</pre></td>
+		<td><pre>XXX</pre></td></tr>
+	<tr><td><pre>XXX</pre></td></tr>
+	<tr><td><pre>xxx</pre></td></tr>
+-->
+	</tbody>
+</table>
+
+<!-- ################################################################################ -->
+
+<!-- ********************************************************************************************* -->
+<h2 id="abnf-rules">URI Rules (RFC3986)</h2>
+<p><a href="http://tools.ietf.org/html/rfc3986#appendix-A">RFC3986 Appendix A</a> describes all of the rules which make up the syntax for a valid URI. Each rule has a name and an ABNF syntax definition. All of these rules from RFC3986 are reproduced in Table 2 along with a regular expression implementation for each rule. For non-trivial URI ABNF rules, the regex is presented in verbose free-spacing mode with comments (taken from the ABNF syntax wording, which describe each major component of the regex). Trivial regexes are presented in non-verbose native regex mode.</p>
+
+<p class="note"><strong>SOURCE CODE SNIPPETS:</strong> With Javascript enabled, you can double-click on any regular expression to generate a TEXTAREA box containing a code snippet for one of several different languages. Double-click again to turn it off.</p>
+
+<table cellspacing="0">
+	<caption>Table 2. URI <abbr title="Augmented Backus-Naur Form">ABNF</abbr> syntax rules from RFC3986</caption>
+	<thead>
+	<tr><th rowspan="2">ABNF rule name</th>
+		<th><abbr title="Augmented Backus-Naur Form">ABNF</abbr> rule syntax [ ; comments ]</th>
+	</tr>
+	<tr><th><abbr title="regex">Regular Expression</abbr> rule syntax</th>
+	</tr>
+	</thead>
+	<tbody>
+
+<!-- gen-delims -->
+	<tr id="uri-08"><td rowspan="2"><tt title="URI rule name">gen-delims</tt></td>
+		<td><pre title="ABNF syntax">":" / "/" / "?" / "#" / "[" / "]" / "@"</pre></td></tr>
+	<tr><td class="rfc3986_gen_delims"><pre class="regex">[:/?#[\]@]</pre></td></tr>
+
+<!-- sub-delims -->
+	<tr id="uri-09"><td rowspan="2"><tt title="URI rule name">sub-delims</tt></td>
+		<td><pre title="ABNF syntax">"!" / "$" / "&amp;" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="</pre></td></tr>
+	<tr><td class="rfc3986_sub_delims"><pre class="regex">[!$&amp;'()*+,;=]</pre></td></tr>
+
+<!-- reserved -->
+	<tr id="uri-10"><td rowspan="2"><tt title="URI rule name">reserved</tt></td>
+		<td><pre title="ABNF syntax">gen-delims / sub-delims</pre></td></tr>
+	<tr><td class="rfc3986_reserved"><pre class="regex">[:/?#[\]@!$&amp;'()*+,;=]</pre></td></tr>
+
+<!-- unreserved -->
+	<tr id="uri-11"><td rowspan="2"><tt title="URI rule name">unreserved</tt></td>
+		<td><pre title="ABNF syntax">ALPHA / DIGIT / "-" / "." / "_" / "~"</pre></td></tr>
+	<tr><td class="rfc3986_unreserved"><pre class="regex">[A-Za-z0-9\-._~]</pre></td></tr>
+
+<!-- pct-encoded -->
+	<tr id="uri-12"><td rowspan="2"><tt title="URI rule name">pct-encoded</tt></td>
+		<td><pre title="ABNF syntax">"%" HEXDIG HEXDIG</pre></td></tr>
+	<tr><td class="rfc3986_pct_encoded"><pre class="regex">%[0-9A-Fa-f]{2}</pre></td></tr>
+
+<!-- dec-octet -->
+	<tr id="uri-13"><td rowspan="2"><tt title="URI rule name">dec-octet</tt></td>
+		<td><pre title="ABNF syntax">  DIGIT                 ; 0-9
+/ %x31-39 DIGIT         ; 10-99
+/ "1" 2DIGIT            ; 100-199
+/ "2" %x30-34 DIGIT     ; 200-249
+/ "25" %x30-35          ; 250-255</pre></td></tr>
+	<tr><td class="rfc3986_dec_octet"><pre class="regex">(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)</pre></td></tr>
+
+<!-- IPv4address -->
+	<tr id="uri-14"><td rowspan="2"><tt title="URI rule name">IPv4address</tt></td>
+		<td><pre title="ABNF syntax">dec-octet "." dec-octet "." dec-octet "." dec-octet</pre></td></tr>
+	<tr><td class="rfc3986_IPv4address"><pre class="regex_x"># RFC-3986 URI component:  IPv4address
+(?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}  # dec-octet "." dec-octet "."
+    (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)         # dec-octet "." dec-octet</pre></td></tr>
+
+<!-- h16 -->
+	<tr id="uri-15"><td rowspan="2"><tt title="URI rule name">h16</tt></td>
+		<td><pre title="ABNF syntax">1*4HEXDIG</pre></td></tr>
+	<tr><td class="rfc3986_h16"><pre class="regex">[0-9A-Fa-f]{1,4}</pre></td></tr>
+
+<!-- ls32 -->
+	<tr id="uri-16"><td rowspan="2"><tt title="URI rule name">ls32</tt></td>
+		<td><pre title="ABNF syntax">( h16 ":" h16 ) / IPv4address</pre></td></tr>
+	<tr><td class="rfc3986_ls32"><pre class="regex_x"># RFC-3986 URI component:  ls32
+(?:                                                    # (
+  [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}                  # ( h16 ":" h16 )
+| (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}  # / IPv4address
+      (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+)                                                      # )</pre></td></tr>
+
+<!-- IPv6address -->
+	<tr id="uri-17"><td rowspan="2"><tt title="URI rule name">IPv6address</tt></td>
+		<td><pre title="ABNF syntax">                             6( h16 ":" ) ls32
+/                       "::" 5( h16 ":" ) ls32
+/ [               h16 ] "::" 4( h16 ":" ) ls32
+/ [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+/ [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+/ [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+/ [ *4( h16 ":" ) h16 ] "::"              ls32
+/ [ *5( h16 ":" ) h16 ] "::"              h16
+/ [ *6( h16 ":" ) h16 ] "::"</pre></td></tr>
+	<tr><td class="rfc3986_IPv6address"><pre class="regex_x"># RFC-3986 URI component:  IPv6address
+(?:
+  (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+  |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+  | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+  | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+  | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+  | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+  | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+  ) (?:                                                    # ls32
+      [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}                  # factored out
+    | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}  # from first 7 lines
+          (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)         # of ABNF rule above.
+    )
+|   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+|   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+)</pre></td></tr>
+
+<!-- IPvFuture -->
+	<tr id="uri-18"><td rowspan="2"><tt title="URI rule name">IPvFuture</tt></td>
+		<td><pre title="ABNF syntax">"v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )</pre></td></tr>
+	<tr><td class="rfc3986_IPvFuture"><pre class="regex">[Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+</pre></td></tr>
+
+<!-- IP-literal -->
+	<tr id="uri-19"><td rowspan="2"><tt title="URI rule name">IP-literal</tt></td>
+		<td><pre title="ABNF syntax">"[" ( IPv6address / IPvFuture  ) "]"</pre></td></tr>
+	<tr><td class="rfc3986_IP_literal"><pre class="regex_x"># RFC-3986 URI component:  IP-literal
+\[                                                          # "["
+(?:                                                         # (
+  (?:                                                       # IPv6address
+    (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+    |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+    | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+    | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+    | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+    | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+    | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+    ) (?:
+        [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+      | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+            (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+      )
+  |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+  |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+  )
+| [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+           # / IPvFuture
+)                                                           # )
+\]                                                          # "]"</pre></td></tr>
+
+<!-- reg-name -->
+	<tr id="uri-20"><td rowspan="2"><tt title="URI rule name">reg-name</tt></td>
+		<td><pre title="ABNF syntax">*( unreserved / pct-encoded / sub-delims )</pre></td></tr>
+	<tr><td class="rfc3986_reg_name"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*</pre></td></tr>
+
+<!-- host -->
+	<tr id="uri-21"><td rowspan="2"><tt title="URI rule name">host</tt></td>
+		<td><pre title="ABNF syntax">IP-literal / IPv4address / reg-name</pre></td></tr>
+	<tr><td class="rfc3986_host"><pre class="regex_x"># RFC-3986 URI component:  host
+(?:                                                           # (
+  \[                                                          # IP-literal
+  (?:
+    (?:
+      (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+      |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+      | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+      ) (?:
+          [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+        | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+              (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+        )
+    |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+    |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+    )
+  | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+  )
+  \]
+| (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}           # / IPv4address
+     (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+| (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*            # / reg-name
+)                                                             # )</pre></td></tr>
+
+<!-- userinfo -->
+	<tr id="uri-22"><td rowspan="2"><tt title="URI rule name">userinfo</tt></td>
+		<td><pre title="ABNF syntax">*( unreserved / pct-encoded / sub-delims / ":" )</pre></td></tr>
+	<tr><td class="rfc3986_userinfo"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})*</pre></td></tr>
+
+<!-- port -->
+	<tr id="uri-23"><td rowspan="2"><tt title="URI rule name">port</tt></td>
+		<td><pre title="ABNF syntax">*DIGIT</pre></td></tr>
+	<tr><td class="rfc3986_port"><pre class="regex">[0-9]*</pre></td></tr>
+
+<!-- authority -->
+	<tr id="uri-24"><td rowspan="2"><tt title="URI rule name">authority</tt></td>
+		<td><pre title="ABNF syntax">[ userinfo "@" ] host [ ":" port ]</pre></td></tr>
+	<tr><td class="rfc3986_authority"><pre class="regex_x"># RFC-3986 URI component:  authority
+(?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?     # [ userinfo "@" ]
+(?:                                                           # host
+  \[
+  (?:
+    (?:
+      (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+      |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+      | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+      | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+      ) (?:
+          [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+        | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+              (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+        )
+    |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+    |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+    )
+  | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+  )
+  \]
+| (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+     (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+| (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+)
+(?: : [0-9]* )?                                               # [ ":" port ]</pre></td></tr>
+
+<!-- pchar -->
+	<tr id="uri-25"><td rowspan="2"><tt title="URI rule name">pchar</tt></td>
+		<td><pre title="ABNF syntax">unreserved / pct-encoded / sub-delims / ":" / "@"</pre></td></tr>
+	<tr><td class="rfc3986_pchar"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})</pre></td></tr>
+
+<!-- segment -->
+	<tr id="uri-26"><td rowspan="2"><tt title="URI rule name">segment</tt></td>
+		<td><pre title="ABNF syntax">*pchar</pre></td></tr>
+	<tr><td class="rfc3986_segment"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})*</pre></td></tr>
+
+<!-- segment-nz -->
+	<tr id="uri-27"><td rowspan="2"><tt title="URI rule name">segment-nz</tt></td>
+		<td><pre title="ABNF syntax">1*pchar</pre></td></tr>
+	<tr><td class="rfc3986_segment_nz"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+</pre></td></tr>
+
+<!-- segment-nz-nc -->
+	<tr id="uri-28"><td rowspan="2"><tt title="URI rule name">segment-nz-nc</tt></td>
+		<td><pre title="ABNF syntax">1*( unreserved / pct-encoded / sub-delims / "@" )
+               ; non-zero-length segment without any colon ":"</pre></td></tr>
+	<tr><td class="rfc3986_segment_nz_nc"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@]|%[0-9A-Fa-f]{2})+</pre></td></tr>
+
+<!-- path-abempty -->
+	<tr id="uri-29"><td rowspan="2"><tt title="URI rule name">path-abempty</tt></td>
+		<td><pre title="ABNF syntax">*( "/" segment )</pre></td></tr>
+	<tr><td class="rfc3986_path_abempty"><pre class="regex_x"># RFC-3986 URI component:  path-abempty
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*  # *( "/" segment )</pre></td></tr>
+
+<!-- path-absolute -->
+	<tr id="uri-30"><td rowspan="2"><tt title="URI rule name">path-absolute</tt></td>
+		<td><pre title="ABNF syntax">"/" [ segment-nz *( "/" segment ) ]</pre></td></tr>
+	<tr><td class="rfc3986_path_absolute"><pre class="regex_x"># RFC-3986 URI component:  path-absolute
+/                                                             # "/"
+(?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+     # [ segment-nz
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*  # *( "/" segment )
+)?                                                            # ]</pre></td></tr>
+
+<!-- path-noscheme -->
+	<tr id="uri-31"><td rowspan="2"><tt title="URI rule name">path-noscheme</tt></td>
+		<td><pre title="ABNF syntax">segment-nz-nc *( "/" segment )</pre></td></tr>
+	<tr><td class="rfc3986_path_noscheme"><pre class="regex_x"># RFC-3986 URI component:  path-noscheme
+       (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@] |%[0-9A-Fa-f]{2})+     # segment-nz-nc
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*  # *( "/" segment )</pre></td></tr>
+
+<!-- path-rootless -->
+	<tr id="uri-32"><td rowspan="2"><tt title="URI rule name">path-rootless</tt></td>
+		<td><pre title="ABNF syntax">segment-nz *( "/" segment )</pre></td></tr>
+	<tr><td class="rfc3986_path_rootless"><pre class="regex_x"># RFC-3986 URI component:  path-rootless
+       (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+     # segment-nz
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*  # *( "/" segment )</pre></td></tr>
+
+<!-- path-empty -->
+	<tr id="uri-33"><td rowspan="2"><tt title="URI rule name">path-empty</tt></td>
+		<td><pre title="ABNF syntax">0pchar</pre></td></tr>
+	<tr><td class="rfc3986_path_empty"><pre class="regex">.{0}</pre></td></tr>
+
+<!-- path -->
+	<tr id="uri-34"><td rowspan="2"><tt title="URI rule name">path</tt></td>
+		<td><pre title="ABNF syntax">  path-abempty    ; begins with "/" or is empty
+/ path-absolute   ; begins with "/" but not "//"
+/ path-noscheme   ; begins with a non-colon segment
+/ path-rootless   ; begins with a segment
+/ path-empty      ; zero characters</pre></td></tr>
+	<tr><td class="rfc3986_path"><pre class="regex_x"># RFC-3986 URI component:  path
+(?:                                                             # (
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*  #   path-abempty
+| /                                                             # / path-absolute
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@] |%[0-9A-Fa-f]{2})+     # / path-noscheme
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+     # / path-rootless
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|                                                               # / path-empty
+)                                                               # )</pre></td></tr>
+
+<!-- hier-part -->
+	<tr id="uri-35"><td rowspan="2"><tt title="URI rule name">hier-part</tt></td>
+		<td><pre title="ABNF syntax">"//" authority path-abempty
+/ path-absolute
+/ path-rootless
+/ path-empty</pre></td></tr>
+	<tr><td class="rfc3986_hier_part"><pre class="regex_x"># RFC-3986 URI component:  hier-part
+(?: //                                                          # ( "//"
+  (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?     # authority
+  (?:
+    \[
+    (?:
+      (?:
+        (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+        |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+        | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+        ) (?:
+            [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+          | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+          )
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+      )
+    | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+    )
+    \]
+  | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+       (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+  | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+  )
+  (?: : [0-9]* )?
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*    # path-abempty
+| /                                                             # / path-absolute
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+     # / path-rootless
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|                                                               # / path-empty
+)                                                               # )</pre></td></tr>
+
+<!-- scheme -->
+	<tr id="uri-36"><td rowspan="2"><tt title="URI rule name">scheme</tt></td>
+		<td><pre title="ABNF syntax">ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )</pre></td></tr>
+	<tr><td class="rfc3986_scheme"><pre class="regex">[A-Za-z][A-Za-z0-9+\-.]*</pre></td></tr>
+
+<!-- query -->
+	<tr id="uri-37"><td rowspan="2"><tt title="URI rule name">query</tt></td>
+		<td><pre title="ABNF syntax">*( pchar / "/" / "?" )</pre></td></tr>
+	<tr><td class="rfc3986_query"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*</pre></td></tr>
+
+<!-- absolute-URI -->
+	<tr id="uri-38"><td rowspan="2"><tt title="URI rule name">absolute-URI</tt></td>
+		<td><pre title="ABNF syntax">scheme ":" hier-part [ "?" query ]</pre></td></tr>
+	<tr><td class="rfc3986_absolute_URI"><pre class="regex_x"># free-spacing mode regex for URI component:  absolute-URI
+[A-Za-z][A-Za-z0-9+\-.]* :                                      # scheme ":"
+(?: //                                                          # hier-part
+  (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?
+  (?:
+    \[
+    (?:
+      (?:
+        (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+        |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+        | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+        ) (?:
+            [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+          | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+          )
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+      )
+    | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+    )
+    \]
+  | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+       (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+  | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+  )
+  (?: : [0-9]* )?
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+| /
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|
+)
+(?:\? (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?   # [ "?" query ]</pre></td></tr>
+
+<!-- fragment -->
+	<tr id="uri-39"><td rowspan="2"><tt title="URI rule name">fragment</tt></td>
+		<td><pre title="ABNF syntax">*( pchar / "/" / "?" )</pre></td></tr>
+	<tr><td class="rfc3986_fragment"><pre class="regex">(?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*</pre></td></tr>
+
+<!-- URI -->
+	<tr id="uri-40"><td rowspan="2"><tt title="URI rule name">URI</tt></td>
+		<td><pre title="ABNF syntax">scheme ":" hier-part [ "?" query ] [ "#" fragment ]</pre></td></tr>
+	<tr><td class="rfc3986_URI"><pre class="regex_x"># RFC-3986 URI component:  URI
+[A-Za-z][A-Za-z0-9+\-.]* :                                      # scheme ":"
+(?: //                                                          # hier-part
+  (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?
+  (?:
+    \[
+    (?:
+      (?:
+        (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+        |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+        | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+        ) (?:
+            [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+          | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+          )
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+      )
+    | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+    )
+    \]
+  | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+       (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+  | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+  )
+  (?: : [0-9]* )?
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+| /
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|
+)
+(?:\? (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?   # [ "?" query ]
+(?:\# (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?   # [ "#" fragment ]</pre></td></tr>
+
+<!-- relative-part -->
+	<tr id="uri-41"><td rowspan="2"><tt title="URI rule name">relative-part</tt></td>
+		<td><pre title="ABNF syntax">"//" authority path-abempty
+/ path-absolute
+/ path-noscheme
+/ path-empty</pre></td></tr>
+	<tr><td class="rfc3986_relative_part"><pre class="regex_x"># RFC-3986 URI component:  relative-part
+(?: //                                                          # ( "//"
+  (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?     # authority
+  (?:
+    \[
+    (?:
+      (?:
+        (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+        |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+        | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+        ) (?:
+            [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+          | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+          )
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+      )
+    | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+    )
+    \]
+  | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+       (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+  | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+  )
+  (?: : [0-9]* )?
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*    # path-abempty
+| /                                                             # / path-absolute
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@] |%[0-9A-Fa-f]{2})+     # / path-noscheme
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|                                                               # / path-empty
+)                                                               # )</pre></td></tr>
+
+<!-- relative-ref -->
+	<tr id="uri-42"><td rowspan="2"><tt title="URI rule name">relative-ref</tt></td>
+		<td><pre title="ABNF syntax">relative-part [ "?" query ] [ "#" fragment ]</pre></td></tr>
+	<tr><td class="rfc3986_relative_ref"><pre class="regex_x"># RFC-3986 URI component:  relative-ref
+(?: //                                                          # relative-part
+  (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?
+  (?:
+    \[
+    (?:
+      (?:
+        (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+        |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+        | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+        | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+        ) (?:
+            [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+          | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+          )
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+      |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+      )
+    | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+    )
+    \]
+  | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+       (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+  | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+  )
+  (?: : [0-9]* )?
+  (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+| /
+  (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  )?
+|        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@] |%[0-9A-Fa-f]{2})+
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+|
+)
+(?:\? (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?   # [ "?" query ]
+(?:\# (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?   # [ "#" fragment ]</pre></td></tr>
+
+<!-- URI-reference -->
+	<tr id="uri-43"><td rowspan="2"><tt title="URI rule name">URI-reference</tt></td>
+		<td><pre title="ABNF syntax">URI / relative-ref</pre></td></tr>
+	<tr><td class="rfc3986_URI_reference"><pre class="regex_x"># RFC-3986 URI component: URI-reference
+(?:                                                               # (
+  [A-Za-z][A-Za-z0-9+\-.]* :                                      # URI
+  (?: //
+    (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?
+    (?:
+      \[
+      (?:
+        (?:
+          (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+          |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+          | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+          ) (?:
+              [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+            | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                  (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+            )
+        |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+        |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+        )
+      | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+      )
+      \]
+    | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+         (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+    | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+    )
+    (?: : [0-9]* )?
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  | /
+    (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+      (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+    )?
+  |        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+      (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  |
+  )
+  (?:\? (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?
+  (?:\# (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?
+| (?: //                                                          # / relative-ref
+    (?: (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:]|%[0-9A-Fa-f]{2})* @)?
+    (?:
+      \[
+      (?:
+        (?:
+          (?:                                                    (?:[0-9A-Fa-f]{1,4}:){6}
+          |                                                   :: (?:[0-9A-Fa-f]{1,4}:){5}
+          | (?:                            [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){4}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,1} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){3}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,2} [0-9A-Fa-f]{1,4})? :: (?:[0-9A-Fa-f]{1,4}:){2}
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,3} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}:
+          | (?: (?:[0-9A-Fa-f]{1,4}:){0,4} [0-9A-Fa-f]{1,4})? ::
+          ) (?:
+              [0-9A-Fa-f]{1,4} : [0-9A-Fa-f]{1,4}
+            | (?: (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \.){3}
+                  (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+            )
+        |   (?: (?:[0-9A-Fa-f]{1,4}:){0,5} [0-9A-Fa-f]{1,4})? ::    [0-9A-Fa-f]{1,4}
+        |   (?: (?:[0-9A-Fa-f]{1,4}:){0,6} [0-9A-Fa-f]{1,4})? ::
+        )
+      | [Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&amp;'()*+,;=:]+
+      )
+      \]
+    | (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}
+         (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+    | (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=]|%[0-9A-Fa-f]{2})*
+    )
+    (?: : [0-9]* )?
+    (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  | /
+    (?:    (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})+
+      (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+    )?
+  |        (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=@] |%[0-9A-Fa-f]{2})+
+      (?:/ (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@]|%[0-9A-Fa-f]{2})* )*
+  |
+  )
+  (?:\? (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?
+  (?:\# (?:[A-Za-z0-9\-._~!$&amp;'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?
+)                                                                       # )</pre></td></tr>
+
+	</tbody>
+</table>
+
+<!-- ********************************************************************************************* -->
+<h2>Miscellaneous Table Notes</h2>
+<ul>
+	<li>The table is presented in order of increasing complexity, with simple rules defined first. Rules which use (and depend upon) other rules, are presented only after the rules upon which they depend have first been defined. Thus, all components of each rule are defined before they are presented.</li>
+	<li>The rules towards the end of the table appear to be quite long and complex. However, if the table is read in order, starting with the simple components first, it becomes apparent that these long complex regexs are actually nothing more than a bunch of short, simple regexs strung together.</li>
+	<li>To improve readability and provide better documentation, the ABNF rule syntax wording is duplicated, split up and used as end-of-line <tt># comments</tt> for the verbose, free-spacing versions of the regular expressions.</li>
+	<li>All of the regular expressions in Table 2 are presented as simple sub expressions, with no end-of-string or word boundary anchors (i.e. no "^", "$", "\A", "\z", "\b" or lookaround), and these (building block regex fragment) sub-expressions are not really meant to be used as-is in isolation. To be used in a programming language, these individual components should first be combined in any necessary order by concatenating the strings.</li>
+	<li>If Javascript is enabled in the browser, each of the regexes in the table above can be double-clicked to generate a textarea control that is automatically pre-filled with the regex properly formatted and escaped as a code snippet for a variety of computer languages. This allows easy copying-and-pasting to user programs. Note that the <tt>^</tt> and <tt>$</tt> anchors are automatically appended the start and end of the regex code snippets. A drop-down control appears allowing the selection of various languages including the native regex syntax which is selected by default. To clear the textarea box, simply double-click a second time anywhere in the table cell.</li>
+	<li>Each regex is presented in a generic native regular expression format with none of the special characters "escaped". To be used in a programming language, some of these characters will need to be escaped with backslashes. Then the entire regex will typically need to be enclosed within a pair of delimiters, then wrapped in quotes. e.g. for PHP, the regex needs to be enclosed within a pair of matching delimiter characters (typically a forward slash '/'), and then the delimited regex needs to be wrapped within single quotes. Also, each and every occurrence of the delimiter character ('/') and single quote character ("'"), needs to be escaped, by placing a back-slash preceding it. Also, to improve efficiency and matching accuracy, anchors should be added to the beginning ("^") and/or end ("$") of the regex. i.e. <tt>$re_pattern = '/^regex$/';</tt></li>
+	<li>All of the regular expressions in Table 2 use non-capturing parenthesis and case sensitive mode for speed. Only commonly implemented generic regex syntax is used to maximize compatibility across many regex tools. (All these regexs should work without any significant modification in many tools, including; Perl, PHP, Java, JavaScript, Apache, .NET, Python, and many others. Although some tools (JavaScript) do not support the more readable free-spacing, commented version.)</li>
+	<li>Regexs for ABNF rules which use alternation at the top level have been modified to enclose the entire rule within a set of parenthesis, so that regexs can be directly concatenated without resulting errors. e.g. <tt>ls32</tt> is changed from: <tt>'( h16 ":" h16 ) / IPv4address'</tt> to <tt>'( ( h16 ":" h16 ) / IPv4address )'.</tt></li>
+	<li>For the IPv6address ABNF rule, the <tt>ls32</tt> component is common to the first 7 lines of the rule. To shorten the resulting regex, this <tt>ls32</tt> component was factored out with no loss of accuracy.</li>
+	<li>For the <tt>dec-octet</tt> ABNF rule, a more streamlined regex is taken from Jeffrey Friedl's "<a href="http://www.amazon.com/Mastering-Regular-Expressions-Jeffrey-Friedl/dp/0596528124">Mastering Regular Expressions 3rd Edition</a>", (a <em>highly</em> recommended book. In fact, a second reading of this book was a major motivating factor in the writing of this article.)</li>
+</ul>
+
+<!-- ********************************************************************************************* -->
+<h2 id="sumary">Summary</h2>
+<p>Regular Expressions are a great tool to help describe (and validate) the precise text semantics which uniquely describe Universal Resource Identifiers. When accurately and consistently adhered to by all users, this URI methodology brings order to the addressing system used to locate each piece of information found on the global internet. Hopefully, this article will help web/network developers properly (and painlessly) implement their networking resource addressing requirements, by reducing their time spent formulating accurate and efficient regular expressions used to parse and validate URIs.</p>
+
+<p>Happy regexing!<br/>
+</p>
+
+<p class="center"><a href="http://validator.w3.org/check?uri=referer"><img style="border:none;width:88px;height:31px;" src="../../img/valid-xhtml10.png" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+<!--
+<a href="http://jigsaw.w3.org/css-validator/check/referer"><img style="border:none;width:88px;height:31px;" src="../../img/vcss.png" alt="Valid CSS!" /></a>
+-->
+</p>
+</div>
+</body>
+</html>
